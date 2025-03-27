@@ -1,1 +1,3 @@
-GET http://localhost:8080/brews
+GET http://localhost:8080/brews/aa
+
+# GET http://localhost:8080/brews/1
