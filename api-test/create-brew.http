@@ -1,0 +1,11 @@
+POST http://localhost:8080/brews
+Content-Type: application/json
+
+{
+    "coffeegrams": 12,
+    "grindsize": 4,
+    "watergrams": 200,
+    "brewingmethod": "kalita",
+    "brewtime": 30
+}
+
