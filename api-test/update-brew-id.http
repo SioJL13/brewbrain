@@ -1,12 +1,11 @@
-POST http://localhost:8080/brews
-Content-Type: application/json
+PUT http://localhost:8080/brews/10
 
 {
     "coffeename": "mytest",
+    "coffeetype": "honey",
     "coffeegrams": 18,
-    "grindsize": 4,
+    "grindsize": 9,
     "watergrams": 200,
     "brewingmethod": "kalita",
     "brewtime": 90
 }
-

@@ -16,3 +16,6 @@ GET /brews → Fetch past brews.
 POST /recipes/calculate → Calculate water/coffee ratio.
 
 GET /recommendations → Suggest grind size & water temp.
+
+
+<!-- x1515269851 -->

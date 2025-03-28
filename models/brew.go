@@ -55,6 +55,49 @@ func (b Brew) Save() error {
 	return err
 }
 
+func (b Brew) Update() error {
+	query := `
+	UPDATE brews SET
+		coffeeName = ?, 
+		coffeeType = ?, 
+		coffeeGrams = ?, 
+		grindSize = ?,
+		waterGrams = ?,
+		brewingMethod = ?,
+		brewTime = ?,
+		extractionTime = ?,
+		waterTemp = ?,
+		grinderType = ?
+	 WHERE id = ?;`
+
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+	_, err = stmt.Exec(b.CoffeeName, b.CoffeeType, b.CoffeeGrams,
+		b.GrindSize, b.WaterGrams, b.BrewingMethod, b.BrewTime,
+		b.ExtractionTime, b.WaterTemp, b.GrinderType, b.ID)
+
+	return err
+}
+
+func (b Brew) Delete() error {
+	query := `DELETE FROM brews WHERE id = ?;`
+
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(b.ID)
+
+	return err
+}
+
 func GetAllBrews() ([]Brew, error) {
 	query := `SELECT * FROM brews`
 
