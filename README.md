@@ -17,5 +17,9 @@ POST /recipes/calculate → Calculate water/coffee ratio.
 
 GET /recommendations → Suggest grind size & water temp.
 
+Brew Timer Page – Guides users step by step through the brewing process.
 
+Recipe Calculator – Adjusts coffee-to-water ratio.
+
+Brew Log – Save past brews with grind size, temperature, and notes.
 <!-- x1515269851 -->

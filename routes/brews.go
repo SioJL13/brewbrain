@@ -40,8 +40,6 @@ func createBrew(context *gin.Context) {
 		return
 	}
 
-	brew.ID = 1
-
 	err = brew.Save()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
