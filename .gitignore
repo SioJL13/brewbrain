@@ -25,3 +25,4 @@ go.work.sum
 .env
 mise.local.toml
 *.db
+.DS_STORE

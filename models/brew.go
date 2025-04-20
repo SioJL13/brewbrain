@@ -1,145 +1,112 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/siojl13/brewbrain/db"
 )
 
 type Brew struct {
-	ID             int64
+	ID             int64 `gorm:"primaryKey"`
 	CoffeeName     string
-	CoffeeType     string  // honey, natural, lavado
-	CoffeeGrams    float64 `binding:"required"`
-	GrindSize      int     `binding:"required"` // numeric grind size
-	WaterGrams     float64 `binding:"required"`
-	BrewingMethod  string  `binding:"required"` // kalita, breville, aeropress, etc
-	BrewTime       int     `binding:"required"` //in seconds
-	ExtractionTime int     // in seconds
-	WaterTemp      float64 // Celcius
-	GrinderType    string  // breville, timemore
-	CreatedAt      time.Time
+	CoffeeType     string
+	CoffeeGrams    float64
+	GrindSize      int
+	WaterGrams     float64
+	BrewingMethod  string
+	BrewTime       int
+	ExtractionTime int
+	WaterTemp      float64
+	GrinderType    string
+	CreatedAt      time.Time `gorm:"autoCreateTime"`
 }
 
 func (b Brew) Save() error {
-	query := `
-	INSERT INTO brews(
-		coffeeName, 
-		coffeeType, 
-		coffeeGrams, 
-		grindSize,
-		waterGrams,
-		brewingMethod,
-		brewTime,
-		extractionTime,
-		waterTemp,
-		grinderType,
-		createdAt
-	) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);`
-	stmt, err := db.DB.Prepare(query)
-	if err != nil {
-		return err
+	tx := db.DB.Create(&b)
+
+	if tx.Error != nil {
+		fmt.Println("here")
+		return tx.Error
 	}
 
-	defer stmt.Close()
-	res, err := stmt.Exec(b.CoffeeName, b.CoffeeType, b.CoffeeGrams,
-		b.GrindSize, b.WaterGrams, b.BrewingMethod, b.BrewTime,
-		b.ExtractionTime, b.WaterTemp, b.GrinderType)
-
-	if err != nil {
-		return err
-	}
-
-	_, err = res.LastInsertId()
-
-	return err
+	return nil
 }
 
 func (b Brew) Update() error {
-	query := `
-	UPDATE brews SET
-		coffeeName = ?, 
-		coffeeType = ?, 
-		coffeeGrams = ?, 
-		grindSize = ?,
-		waterGrams = ?,
-		brewingMethod = ?,
-		brewTime = ?,
-		extractionTime = ?,
-		waterTemp = ?,
-		grinderType = ?
-	 WHERE id = ?;`
+	db.DB.First(&b)
+	tx := db.DB.Save(&Brew{
+		CoffeeName: b.CoffeeName,
+	})
 
-	stmt, err := db.DB.Prepare(query)
-	if err != nil {
-		return err
-	}
+	// query := `
+	// UPDATE brews SET
+	// 	coffeeName = ?,
+	// 	coffeeType = ?,
+	// 	coffeeGrams = ?,
+	// 	grindSize = ?,
+	// 	waterGrams = ?,
+	// 	brewingMethod = ?,
+	// 	brewTime = ?,
+	// 	extractionTime = ?,
+	// 	waterTemp = ?,
+	// 	grinderType = ?
+	//  WHERE id = ?;`
 
-	defer stmt.Close()
-	_, err = stmt.Exec(b.CoffeeName, b.CoffeeType, b.CoffeeGrams,
-		b.GrindSize, b.WaterGrams, b.BrewingMethod, b.BrewTime,
-		b.ExtractionTime, b.WaterTemp, b.GrinderType, b.ID)
+	// stmt, err := db.DB.Prepare(query)
+	// if err != nil {
+	// 	return err
+	// }
 
-	return err
+	// defer stmt.Close()
+	// _, err = stmt.Exec(b.CoffeeName, b.CoffeeType, b.CoffeeGrams,
+	// 	b.GrindSize, b.WaterGrams, b.BrewingMethod, b.BrewTime,
+	// 	b.ExtractionTime, b.WaterTemp, b.GrinderType, b.ID)
+
+	return tx.Error
 }
 
 func (b Brew) Delete() error {
-	query := `DELETE FROM brews WHERE id = ?;`
+	tx := db.DB.Delete(&b)
 
-	stmt, err := db.DB.Prepare(query)
-	if err != nil {
-		return err
-	}
-
-	defer stmt.Close()
-
-	_, err = stmt.Exec(b.ID)
-
-	return err
+	return tx.Error
 }
 
-func GetAllBrews() ([]Brew, error) {
-	query := `SELECT * FROM brews`
+// func GetAllBrews() ([]Brew, error) {
+// 	query := `SELECT * FROM brews`
 
-	rows, err := db.DB.Query(query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+// 	rows, err := db.DB.Query(query)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer rows.Close()
 
-	var brews []Brew
+// 	var brews []Brew
 
-	for rows.Next() {
-		var brew Brew
-		err := rows.Scan(&brew.ID, &brew.CoffeeName,
-			&brew.CoffeeType, &brew.CoffeeGrams,
-			&brew.GrindSize, &brew.WaterGrams,
-			&brew.BrewingMethod, &brew.BrewTime,
-			&brew.ExtractionTime, &brew.WaterTemp, &brew.GrinderType, &brew.CreatedAt)
+// 	for rows.Next() {
+// 		var brew Brew
+// 		err := rows.Scan(&brew.ID, &brew.CoffeeName,
+// 			&brew.CoffeeType, &brew.CoffeeGrams,
+// 			&brew.GrindSize, &brew.WaterGrams,
+// 			&brew.BrewingMethod, &brew.BrewTime,
+// 			&brew.ExtractionTime, &brew.WaterTemp, &brew.GrinderType, &brew.CreatedAt)
 
-		if err != nil {
-			return nil, err
-		}
+// 		if err != nil {
+// 			return nil, err
+// 		}
 
-		brews = append(brews, brew)
-	}
+// 		brews = append(brews, brew)
+// 	}
 
-	return brews, nil
-}
+// 	return brews, nil
+// }
 
 func GetBrewByID(id int64) (*Brew, error) {
-	query := "SELECT * FROM brews WHERE id = ?"
-	row := db.DB.QueryRow(query, id)
-
-	//TODO: check sqlx for direct mapping
 	var brew Brew
-	err := row.Scan(&brew.ID, &brew.CoffeeName,
-		&brew.CoffeeType, &brew.CoffeeGrams,
-		&brew.GrindSize, &brew.WaterGrams,
-		&brew.BrewingMethod, &brew.BrewTime,
-		&brew.ExtractionTime, &brew.WaterTemp, &brew.GrinderType, &brew.CreatedAt)
-	if err != nil {
-		return nil, err
+	tx := db.DB.First(&brew, id)
+
+	if tx.Error != nil {
+		return nil, tx.Error
 	}
 
 	return &brew, nil

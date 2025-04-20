@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -8,14 +9,14 @@ import (
 	"github.com/siojl13/brewbrain/models"
 )
 
-func getBrews(context *gin.Context) {
-	brews, err := models.GetAllBrews()
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
-	}
-	context.JSON(http.StatusOK, brews)
-}
+// func getBrews(context *gin.Context) {
+// 	brews, err := models.GetAllBrews()
+// 	if err != nil {
+// 		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+// 		return
+// 	}
+// 	context.JSON(http.StatusOK, brews)
+// }
 
 func getBrew(context *gin.Context) {
 	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
@@ -27,6 +28,7 @@ func getBrew(context *gin.Context) {
 	brew, err := models.GetBrewByID(id)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
 	}
 	context.JSON(http.StatusOK, brew)
 }
@@ -41,6 +43,7 @@ func createBrew(context *gin.Context) {
 	}
 
 	err = brew.Save()
+
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -69,7 +72,8 @@ func updateBrew(context *gin.Context) {
 		return
 	}
 
-	updatedBrew.ID = id
+	// updatedBrew.ID = id
+	fmt.Println(updatedBrew.CoffeeName)
 	err = updatedBrew.Update()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})

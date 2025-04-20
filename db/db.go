@@ -1,22 +1,19 @@
 package db
 
 import (
-	"database/sql"
-
 	_ "github.com/mattn/go-sqlite3"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
-var DB *sql.DB
+var DB *gorm.DB
 
 func InitDB() {
 	var err error
-	DB, err = sql.Open("sqlite3", "api.db")
+	DB, err = gorm.Open(sqlite.Open("api.db"), &gorm.Config{})
 	if err != nil {
 		panic("Couldnt connect to the Db!")
 	}
-
-	DB.SetMaxOpenConns(10)
-	DB.SetMaxIdleConns(5)
 
 	createTables()
 }
@@ -25,22 +22,22 @@ func createTables() {
 	createBrewsTable := `
 	CREATE TABLE IF NOT EXISTS brews (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		coffeeName TEXT,
-		coffeeType TEXT,
-		coffeeGrams DECIMAL NOT NULL,
-		grindSize INTEGER NOT NULL,
-		waterGrams DECIMAL NOT NULL,
-		brewingMethod TEXT NOT NULL,
-		brewTime INTEGER NOT NULL,
-		extractionTime INTEGER, 
-		waterTemp DECIMAL,
-		grinderType TEXT,
-		createdAt DATETIME NOT NULL
+		coffee_name TEXT,
+		coffee_type TEXT,
+		coffee_grams DECIMAL NOT NULL,
+		grind_size INTEGER NOT NULL,
+		water_grams DECIMAL NOT NULL,
+		brewing_method TEXT NOT NULL,
+		brew_time INTEGER NOT NULL,
+		extraction_time INTEGER, 
+		water_temp DECIMAL,
+		grinder_type TEXT,
+		created_at DATETIME NOT NULL
 	)
 	`
 
-	_, err := DB.Exec(createBrewsTable)
-	if err != nil {
-		panic("cant create brews table: " + err.Error())
+	tx := DB.Exec(createBrewsTable)
+	if tx.Error != nil {
+		panic("cant create brews table: " + tx.Error.Error())
 	}
 }

@@ -2,11 +2,11 @@ POST http://localhost:8080/brews
 Content-Type: application/json
 
 {
-    "coffeename": "mytest",
-    "coffeegrams": 18,
-    "grindsize": 4,
-    "watergrams": 200,
-    "brewingmethod": "kalita",
-    "brewtime": 90
+    "coffeeName": "playa",
+    "coffeeGrams": 18,
+    "grindSize": 4,
+    "waterGrams": 200,
+    "brewingMethod": "kalita",
+    "brewTime": 90
 }
 

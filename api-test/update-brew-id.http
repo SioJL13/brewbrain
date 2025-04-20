@@ -1,11 +1,5 @@
-PUT http://localhost:8080/brews/10
+PUT http://localhost:8080/brews/3
 
 {
-    "coffeename": "mytest",
-    "coffeetype": "honey",
-    "coffeegrams": 18,
-    "grindsize": 9,
-    "watergrams": 200,
-    "brewingmethod": "kalita",
-    "brewtime": 90
+    "coffeename": "doble"
 }
