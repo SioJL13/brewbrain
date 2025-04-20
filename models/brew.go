@@ -33,37 +33,12 @@ func (b Brew) Save() error {
 	return nil
 }
 
-func (b Brew) Update() error {
-	db.DB.First(&b)
-	tx := db.DB.Save(&Brew{
-		CoffeeName: b.CoffeeName,
-	})
-
-	// query := `
-	// UPDATE brews SET
-	// 	coffeeName = ?,
-	// 	coffeeType = ?,
-	// 	coffeeGrams = ?,
-	// 	grindSize = ?,
-	// 	waterGrams = ?,
-	// 	brewingMethod = ?,
-	// 	brewTime = ?,
-	// 	extractionTime = ?,
-	// 	waterTemp = ?,
-	// 	grinderType = ?
-	//  WHERE id = ?;`
-
-	// stmt, err := db.DB.Prepare(query)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// defer stmt.Close()
-	// _, err = stmt.Exec(b.CoffeeName, b.CoffeeType, b.CoffeeGrams,
-	// 	b.GrindSize, b.WaterGrams, b.BrewingMethod, b.BrewTime,
-	// 	b.ExtractionTime, b.WaterTemp, b.GrinderType, b.ID)
-
-	return tx.Error
+func (b *Brew) Update(fields Brew) error {
+	return db.DB.
+		Model(&Brew{}).
+		Where("id = ?", b.ID).
+		Updates(fields).
+		Error
 }
 
 func (b Brew) Delete() error {
@@ -72,34 +47,13 @@ func (b Brew) Delete() error {
 	return tx.Error
 }
 
-// func GetAllBrews() ([]Brew, error) {
-// 	query := `SELECT * FROM brews`
+func GetAllBrews() ([]Brew, error) {
+	var brews []Brew
 
-// 	rows, err := db.DB.Query(query)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer rows.Close()
+	rows := db.DB.Find(&brews)
 
-// 	var brews []Brew
-
-// 	for rows.Next() {
-// 		var brew Brew
-// 		err := rows.Scan(&brew.ID, &brew.CoffeeName,
-// 			&brew.CoffeeType, &brew.CoffeeGrams,
-// 			&brew.GrindSize, &brew.WaterGrams,
-// 			&brew.BrewingMethod, &brew.BrewTime,
-// 			&brew.ExtractionTime, &brew.WaterTemp, &brew.GrinderType, &brew.CreatedAt)
-
-// 		if err != nil {
-// 			return nil, err
-// 		}
-
-// 		brews = append(brews, brew)
-// 	}
-
-// 	return brews, nil
-// }
+	return brews, rows.Error
+}
 
 func GetBrewByID(id int64) (*Brew, error) {
 	var brew Brew

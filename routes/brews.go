@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -9,14 +8,14 @@ import (
 	"github.com/siojl13/brewbrain/models"
 )
 
-// func getBrews(context *gin.Context) {
-// 	brews, err := models.GetAllBrews()
-// 	if err != nil {
-// 		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-// 		return
-// 	}
-// 	context.JSON(http.StatusOK, brews)
-// }
+func getBrews(context *gin.Context) {
+	brews, err := models.GetAllBrews()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	context.JSON(http.StatusOK, brews)
+}
 
 func getBrew(context *gin.Context) {
 	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
@@ -52,35 +51,31 @@ func createBrew(context *gin.Context) {
 	context.JSON(http.StatusCreated, gin.H{"message": "brew created", "brew": brew})
 }
 
-func updateBrew(context *gin.Context) {
-	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
+func updateBrew(c *gin.Context) {
+	// parse the :id
+	id64, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid id"})
 		return
 	}
 
-	_, err = models.GetBrewByID(id)
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	// bind JSON into a Brew
+	var brew models.Brew
+	if err := c.ShouldBindJSON(&brew); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	var updatedBrew models.Brew
-	err = context.ShouldBindJSON(&updatedBrew)
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+	// **set the ID** so GORM knows which row to update
+	brew.ID = id64
+
+	// call Update method
+	if err := brew.Update(brew); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-	// updatedBrew.ID = id
-	fmt.Println(updatedBrew.CoffeeName)
-	err = updatedBrew.Update()
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
-	}
-
-	context.JSON(http.StatusOK, gin.H{"message": "updated"})
+	c.JSON(http.StatusOK, brew)
 }
 
 func deleteBrew(context *gin.Context) {
