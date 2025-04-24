@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/siojl13/brewbrain/db"
+	"gorm.io/gorm"
 )
 
 type Brew struct {
@@ -20,6 +21,10 @@ type Brew struct {
 	WaterTemp      float64
 	GrinderType    string
 	CreatedAt      time.Time `gorm:"autoCreateTime"`
+}
+
+func Migrate(db *gorm.DB) error {
+	return db.AutoMigrate(&Brew{})
 }
 
 func (b Brew) Save() error {
